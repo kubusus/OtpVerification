@@ -42,7 +42,7 @@ namespace Microsoft.Extensions.DependencyInjection
                (string key) =>
                {
                    var otp = endpoints.ServiceProvider.GetRequiredService<IOtpVerificationService>();
-                   if(otp.Scan(key))
+                   if(otp.VerifyOtp(key))
                        return "Verify";
                    return "Un-Verify";
                });

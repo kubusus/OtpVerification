@@ -10,13 +10,13 @@ namespace OtpVerification.Services
 {
     public interface IOtpVerificationService
     {
-        OtpData Generate(string id);
-        OtpData Generate(string id, out DateTime expire);
-        OtpData Generate(string id, OtpVerificationOptions option);
+        OtpData GenerateOtp(string id);
+        OtpData GenerateOtp(string id, out DateTime expire);
+        OtpData GenerateOtp(string id, OtpVerificationOptions option);
         OtpData Generate(string id, OtpVerificationOptions option, out DateTime expire);
-        bool Scan(string id, string plain);
-        bool Scan(string id, string plain, OtpVerificationOptions option);
-        bool Scan(string id, string plain, int expire);
-        bool Scan(string url);
+        bool VerifyOtp(string id, string plain);
+        bool VerifyOtp(string id, string plain, OtpVerificationOptions option);
+        bool VerifyOtp(string id, string plain, int expire);
+        bool VerifyOtp(string url);
     }
 }

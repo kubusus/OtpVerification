@@ -18,6 +18,8 @@ namespace OtpVerification.Services
 
     public class OtpVerificationService : IOtpVerificationService
     {
+
+        #region dependency injection
         private readonly IHttpContextAccessor httpContext;
         private readonly IDistributedCache distributedCache;
         private readonly IMemoryCache memoryCache;
@@ -31,14 +33,15 @@ namespace OtpVerification.Services
             this.httpContext = httpContext;
             this.distributedCache = distributedCache;
             this.memoryCache = memoryCache;
-            this.options = options?.Value ?? new OtpVerificationOptions();
             this.dataProtection = dataProtection.CreateProtector("This is a very secure key");
+            this.options = options?.Value ?? new OtpVerificationOptions();
         }
+        #endregion
 
         private record class IdPlain(string id, string plain);
         private string BaseOtpUrl => $"{httpContext.HttpContext.Request.Scheme}://{httpContext.HttpContext.Request.Host}/{nameof(OtpVerificationService)}/";
 
-        private string Key(string id)
+        private string GenerateCacheKey(string id)
         {
             if (string.IsNullOrEmpty(id))
                 throw new ArgumentNullException($"{nameof(OtpVerificationService)} Unique {nameof(id)} can't be null or empty");
@@ -47,7 +50,7 @@ namespace OtpVerification.Services
         }
 
 
-        private bool TryUnprotectUrl(string key, out string id, out string plain)
+        private bool TryDecryptProtectedUrl(string key, out string id, out string plain)
         {
             id = plain = string.Empty;
             try
@@ -65,17 +68,17 @@ namespace OtpVerification.Services
             }
         }
 
-        public OtpData Generate(string id)
+        public OtpData GenerateOtp(string id)
         {
-            return Generate(id, out _);
+            return GenerateOtp(id, out _);
         }
 
-        public OtpData Generate(string id, out DateTime expire)
+        public OtpData GenerateOtp(string id, out DateTime expire)
         {
             return Generate(id, options, out expire);
         }
 
-        public OtpData Generate(string id, OtpVerificationOptions option)
+        public OtpData GenerateOtp(string id, OtpVerificationOptions option)
         {
             return Generate(id, option, out _);
         }
@@ -85,13 +88,13 @@ namespace OtpVerification.Services
             var plain = OtpVerificationExtension.Generate(option, out expire, out string hash);
 
             if (options.IsInMemoryCache)
-                memoryCache.Set(Key(id), hash, new MemoryCacheEntryOptions
+                memoryCache.Set(GenerateCacheKey(id), hash, new MemoryCacheEntryOptions
                 {
                     AbsoluteExpiration = expire,
                     Priority = CacheItemPriority.High,
                 });
             else
-                distributedCache.SetString(Key(id), hash, new DistributedCacheEntryOptions()
+                distributedCache.SetString(GenerateCacheKey(id), hash, new DistributedCacheEntryOptions()
                 {
                     AbsoluteExpiration = expire,
                 });
@@ -105,14 +108,14 @@ namespace OtpVerification.Services
         }
 
 
-        public bool Scan(string id, string plain, OtpVerificationOptions option)
+        public bool VerifyOtp(string id, string plain, OtpVerificationOptions option)
         {
             string hash = string.Empty;
 
             if (options.IsInMemoryCache)
-                hash = memoryCache.Get<string>(Key(id));
+                hash = memoryCache.Get<string>(GenerateCacheKey(id));
             else
-                hash = distributedCache.GetString(Key(id));
+                hash = distributedCache.GetString(GenerateCacheKey(id));
 
             if (hash is null)
                 return false;
@@ -120,29 +123,29 @@ namespace OtpVerification.Services
             if (OtpVerificationExtension.Scan(plain, hash, option))
             {
                 if (options.IsInMemoryCache)
-                    memoryCache.Remove(Key(id));
+                    memoryCache.Remove(GenerateCacheKey(id));
                 else
-                    distributedCache.Remove(Key(id));
+                    distributedCache.Remove(GenerateCacheKey(id));
                 return true;
             }
 
             return false;
         }
 
-        public bool Scan(string id, string plain, int expire)
+        public bool VerifyOtp(string id, string plain, int expire)
         {
-            return Scan(id, plain, new OtpVerificationOptions() { Expire = expire });
+            return VerifyOtp(id, plain, new OtpVerificationOptions() { Expire = expire });
         }
 
-        public bool Scan(string id, string plain)
+        public bool VerifyOtp(string id, string plain)
         {
-            return Scan(id, plain, options);
+            return VerifyOtp(id, plain, options);
         }
 
-        public bool Scan(string url)
+        public bool VerifyOtp(string url)
         {
-            if (TryUnprotectUrl(url, out string id, out string code))
-                return Scan(id, code);
+            if (TryDecryptProtectedUrl(url, out string id, out string code))
+                return VerifyOtp(id, code);
             return false;
         }
     }

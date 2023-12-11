@@ -34,7 +34,7 @@ namespace Example.WebAPI.Controllers
             user.Id =int.Parse(Generator.RandomString(2,StringsOfLetters.Number));
             users.Add(user);
 
-            var code = otp.Generate(user.Id.ToString(),expire: out DateTime expierDate);
+            var code = otp.GenerateOtp(user.Id.ToString(),expire: out DateTime expierDate);
             // this code sent by Email or SMS
             return Ok($"Your via is: {code} ,\nwill expire at: {expierDate}");
         }
@@ -45,7 +45,7 @@ namespace Example.WebAPI.Controllers
             var user = users.Where(u => u.Id == id).FirstOrDefault();
             if (user is null) return NotFound($"user with Id:{id} not exist");
             user.isVerify = false;
-            var code = otp.Generate(user.Id.ToString(), expire: out DateTime expierDate);
+            var code = otp.GenerateOtp(user.Id.ToString(), expire: out DateTime expierDate);
             // this code sent by Email or SMS
             return Ok($"Your via is: {code} ,\nwill expire at: {expierDate}");
         }
@@ -60,7 +60,7 @@ namespace Example.WebAPI.Controllers
 
             if (one.isVerify) return BadRequest($"user with Id:{userId} is already verified");
 
-            if(otp.Scan(userId.ToString(), code))
+            if(otp.VerifyOtp(userId.ToString(), code))
             {
                 one.isVerify = true;
                 return Ok($"user with Id:{userId} successful confirmed his OTP code {code}");
