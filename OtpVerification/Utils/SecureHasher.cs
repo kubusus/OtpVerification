@@ -21,10 +21,12 @@ namespace MhozaifaA.OtpVerification.Utils
                 using (var pbkdf2 = new Rfc2898DeriveBytes(plain, salt, iterations))
                 {
                     var hash = pbkdf2.GetBytes(hashSize);
+
                     // Combine salt and hash
                     var hashBytes = new byte[SaltSize + hashSize];
                     Array.Copy(salt, 0, hashBytes, 0, SaltSize);
                     Array.Copy(hash, 0, hashBytes, SaltSize, hashSize);
+
                     // Convert to base64
                     var base64Hash = Convert.ToBase64String(hashBytes);
 

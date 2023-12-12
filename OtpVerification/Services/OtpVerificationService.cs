@@ -39,7 +39,10 @@ namespace OtpVerification.Services
         #endregion
 
         private record class IdPlain(string id, string plain);
+
+
         private string BaseOtpUrl => $"{httpContext.HttpContext.Request.Scheme}://{httpContext.HttpContext.Request.Host}/{nameof(OtpVerificationService)}/";
+
 
         private string GenerateCacheKey(string id)
         {
@@ -120,7 +123,7 @@ namespace OtpVerification.Services
             if (hash is null)
                 return false;
 
-            if (OtpVerificationExtension.Scan(plain, hash, option))
+            if (OtpVerificationExtension.VerifyOtp(plain, hash, option))
             {
                 if (options.IsInMemoryCache)
                     memoryCache.Remove(GenerateCacheKey(id));

@@ -27,6 +27,7 @@ namespace Example.WebAPI.Controllers
             return Ok(users);
         }
 
+
         [HttpPost]
         public IActionResult CreateUser(User user)
         {
@@ -38,6 +39,7 @@ namespace Example.WebAPI.Controllers
             // this code sent by Email or SMS
             return Ok($"Your via is: {code} ,\nwill expire at: {expierDate}");
         }
+
 
         [HttpPost("{id}")]
         public IActionResult RefreshUser([FromRoute]int id)

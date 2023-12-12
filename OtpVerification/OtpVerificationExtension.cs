@@ -70,7 +70,7 @@ namespace MhozaifaA.OtpVerification
         }
 
 
-        public static bool Scan(string plain, string hash, OtpVerificationOptions option)
+        public static bool VerifyOtp(string plain, string hash, OtpVerificationOptions option)
         {
             if (string.IsNullOrEmpty(plain))
                 throw new ArgumentNullException($"{nameof(OtpVerificationService)} {nameof(plain)} can't be null or empty");
@@ -89,14 +89,14 @@ namespace MhozaifaA.OtpVerification
             return verify;
         }
 
-        public static bool Scan(string plain, string hash, int expire)
+        public static bool VerifyOtp(string plain, string hash, int expire)
         {
-            return Scan(plain, hash, new OtpVerificationOptions() { Expire = expire });
+            return VerifyOtp(plain, hash, new OtpVerificationOptions() { Expire = expire });
         }
 
-        public static bool Scan(string plain, string hash)
+        public static bool VerifyOtp(string plain, string hash)
         {
-            return Scan(plain, hash, new OtpVerificationOptions());
+            return VerifyOtp(plain, hash, new OtpVerificationOptions());
         }
 
     }
