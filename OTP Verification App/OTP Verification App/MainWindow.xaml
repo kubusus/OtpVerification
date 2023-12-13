@@ -1,0 +1,36 @@
+﻿<Window x:Class="OTP_Verification_App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OTP_Verification_App"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Left side -->
+        <StackPanel Grid.Column="0" Margin="10">
+            <StackPanel>
+                <Button Content="Add User" Click="AddUser_Click" />
+                <TextBox x:Name="UserNameTextBox" Margin="0,5,0,10" />
+                <Button Content="Create User" Click="CreateUser_Click" />
+                <TextBox x:Name="GeneratedCodeTextBox" Margin="0,5,0,10" IsReadOnly="True" />
+                <TextBlock x:Name="TimeLeftTextBlock" />
+            </StackPanel>
+
+            <DataGrid x:Name="UsersDataGrid" AutoGenerateColumns="True" ItemsSource="{Binding Users}" Margin="0,20,0,0" />
+        </StackPanel>
+
+        <!-- Right side -->
+        <StackPanel Grid.Column="1" Margin="10">
+            <TextBox x:Name="LoginUsernameTextBox" Margin="0,5,0,10"  />
+            <TextBox x:Name="LoginOtpTextBox" Margin="0,5,0,10"  />
+            <Button Content="Log In" Click="Login_Click" />
+            <TextBlock x:Name="LoginResultTextBlock" Margin="0,20,0,0" />
+        </StackPanel>
+    </Grid>
+</Window>
