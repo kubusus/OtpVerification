@@ -60,7 +60,7 @@
                     Content="Login"
                     Click="LoginBtn_Click"/>
 
-            <TextBlock Name="InfoTxtB"/>
+            <TextBox Name="InfoTxtB"/>
         </StackPanel>
     </Grid>
 </Window>

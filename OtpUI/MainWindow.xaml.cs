@@ -34,7 +34,7 @@ namespace OtpUI
         private void AddUserBtn_Click(object sender, RoutedEventArgs e)
         {
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("http://localhost:55033");
+            client.BaseAddress = new Uri("http://localhost:7249");
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             User newUser = new User(AddUserNameTxtB.Text);
@@ -43,7 +43,7 @@ namespace OtpUI
             if (response.IsSuccessStatusCode)
             {
                 MessageBox.Show("User added successfully!");
-                GetData(); // Refresh the user list after adding a new user
+                //GetData(); // Refresh the user list after adding a new user
             }
             else
             {
@@ -56,7 +56,7 @@ namespace OtpUI
         private void LoginBtn_Click(object sender, RoutedEventArgs e)
         {
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("http://localhost:55033");
+            client.BaseAddress = new Uri("http://localhost:7249");
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             int userId;
@@ -87,7 +87,7 @@ namespace OtpUI
         private void GetData()
         {
             //HttpClient client = new HttpClient();
-            //client.BaseAddress = new Uri("http://localhost:55033");
+            //client.BaseAddress = new Uri("http://localhost:7249");
             //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             //HttpResponseMessage response = client.GetAsync("api/Otp/GetUsers").Result;
