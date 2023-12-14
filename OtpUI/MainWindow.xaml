@@ -30,29 +30,58 @@
         </Grid.ColumnDefinitions>
 
         <!-- Left side -->
-        <StackPanel Grid.Column="0" Margin="10">
-            <TextBlock Text="User name:"/>
-            <TextBox x:Name="AddUserNameTxtB"/>
-            <Button x:Name="AddUserBtn"
-                    Content="Add new user"
-                    Click="AddUserBtn_Click"/>
+        <StackPanel Name="left_stackPanel" 
+                    Grid.Column="0" 
+                    Margin="10">
+
+            <DockPanel>
+                <TextBlock Text="User name:"/>
+                <TextBox x:Name="AddUserNameTxtB"
+                        DockPanel.Dock="Top"
+                         />
+                <Button x:Name="AddUserBtn"
+                        Content="Add"
+                        Click="AddUserBtn_Click"
+                        HorizontalAlignment="Center"
+                        Width="100"  
+                        DockPanel.Dock="Bottom"
+                        />
+            </DockPanel>
+            
 
 
-            <TextBlock Text="Code"/>
-            <TextBlock x:Name="NewCodeTxtB"
-                       Text=""/>
+            <DockPanel>
+                <TextBlock Text="Code"/>
+                <TextBlock x:Name="NewCodeTxtB"/>
+                <Button x:Name="CopyCodeBtn"
+                        Click="CopyCodeBtn_Click"
+                        Content="Copy"/>
+            </DockPanel>
 
-            <TextBlock Text="Code Expire time"/>
             <TextBlock x:Name="TimeLeftTxtB"/>
 
-            <Button x:Name="GetUsersBtn"
-                    Content="Get users"
-                    Click="GetUsersBtn_Click"/>
 
             <Button x:Name="RefreshUserBtn"
                     Content="Refresh code"
                     Click="RefreshUserBtn_Click"/>
-            <ListView x:Name="UserListBox"/>
+            
+            <ListView x:Name="UserListView"
+                       FontSize="20">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="ID" DisplayMemberBinding="{Binding Id}" />
+                        <GridViewColumn Header="Full Name" DisplayMemberBinding="{Binding FullName}" />
+                        <GridViewColumn Header="Active">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding isVerified, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+
 
         </StackPanel>
 

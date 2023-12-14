@@ -18,6 +18,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Net.Http.Json;
 using Newtonsoft.Json;
+using System.Collections.ObjectModel;
+using System.Windows.Threading;
 
 namespace OtpUI
 {
@@ -32,7 +34,21 @@ namespace OtpUI
             InitializeComponent();
         }
 
-        private async void AddUserBtn_Click(object sender, RoutedEventArgs e)
+
+        void StartTimer()
+        {
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Tick += OnTick;
+            timer.Start();
+        }
+
+        static void OnTick(object sender, EventArgs e)
+        {
+            
+        }
+
+        private async void AddNewUser(User user)
         {
             try
             {
@@ -43,8 +59,7 @@ namespace OtpUI
                     client.BaseAddress = new Uri("http://localhost:5249");
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    User newUser = new User(AddUserNameTxtB.Text);
-                    HttpResponseMessage response = await client.PostAsJsonAsync("api/Otp/CreateUser", newUser);
+                    HttpResponseMessage response = await client.PostAsJsonAsync("api/Otp/CreateUser", user);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -57,13 +72,13 @@ namespace OtpUI
 
                         NewCodeTxtB.Text = $"{code}";
                         TimeLeftTxtB.Text = $"{expireDate}";
-                        GetData();
+                        GetAllUsers();
                     }
 
                     else
                     {
                         InfoTxtB.Text += $"Failed to add user. Request URL: {client.BaseAddress}api/Otp/CreateUser\n";
-                        InfoTxtB.Text += $"User details: {Newtonsoft.Json.JsonConvert.SerializeObject(newUser)}\n";
+                        InfoTxtB.Text += $"User details: {Newtonsoft.Json.JsonConvert.SerializeObject(user)}\n";
                         InfoTxtB.Text += await response.Content.ReadAsStringAsync();
                     }
                 }
@@ -79,49 +94,34 @@ namespace OtpUI
             }
             catch (Exception ex)
             {
-                // Log the exception for further analysis
                 InfoTxtB.Text += ex.ToString();
             }
         }
 
 
-
-
-
-        private void LoginBtn_Click(object sender, RoutedEventArgs e)
+        private void LoginUser(User user)
         {
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri("http://localhost:5249");
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            int userId;
-            if (int.TryParse(LoginTxtB.Text, out userId))
+            string code = LoginCodeTxtB.Text;
+            HttpResponseMessage response = client.PostAsync($"api/Otp/VerifyUser?userId={user.Id}&code={code}", null).Result;
+
+            if (response.IsSuccessStatusCode)
             {
-                string code = LoginCodeTxtB.Text;
-
-                HttpResponseMessage response = client.PostAsync($"api/Otp/VerifyUser?userId={userId}&code={code}", null).Result;
-
-
-
-                if (response.IsSuccessStatusCode)
-                {
-                    string result = response.Content.ReadAsStringAsync().Result;
-                    InfoTxtB.Text = result;
-                    GetData(); // Refresh the user list after a successful login
-                }
-                else
-                {
-                    InfoTxtB.Text = ("User ID or Code is not valid");
-                }
+                string result = response.Content.ReadAsStringAsync().Result;
+                InfoTxtB.Text = result;
+                GetAllUsers(); // Refresh the user list after a successful login
             }
             else
             {
-                MessageBox.Show("Please enter a valid user ID.");
+                InfoTxtB.Text = ("User ID or Code is not valid");
             }
         }
 
 
-        private async void GetData()
+        private async void GetAllUsers()
         {
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri("http://localhost:5249");
@@ -131,8 +131,8 @@ namespace OtpUI
 
             if (response.IsSuccessStatusCode)
             {
-                var users = await response.Content.ReadFromJsonAsync<IEnumerable<User>>();
-                UserListBox.ItemsSource = users;
+                var fetchedUsers = await response.Content.ReadFromJsonAsync<ObservableCollection<User>>();
+                UserListView.ItemsSource = fetchedUsers;
             }
             else
             {
@@ -141,7 +141,7 @@ namespace OtpUI
         }
 
 
-        private async void RefreshUserBtn_Click(object sender, RoutedEventArgs e)
+        private async void RefreshUserCode(User user)
         {
             try
             {
@@ -152,39 +152,30 @@ namespace OtpUI
                     client.BaseAddress = new Uri("http://localhost:5249");
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    int userId;
-                    if (int.TryParse(LoginTxtB.Text, out userId))
+                    
+                    string code = LoginCodeTxtB.Text;
+
+                    var data = new { code = code };
+                    var jsonContent = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PostAsync($"api/Otp/RefreshUser/{user.Id}", jsonContent);
+
+                    if (response.IsSuccessStatusCode)
                     {
-                        string code = LoginCodeTxtB.Text;
+                        var rawResponse = await response.Content.ReadAsStringAsync();
+                        var result = JsonConvert.DeserializeObject<dynamic>(rawResponse);
 
-                        // Create a data object to send in the request body
-                        var data = new { code = code };
+                        string otp = result.code.code;
+                        string expireDate = result.expireDate;
 
-                        // Serialize the data object to JSON
-                        var jsonContent = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+                        NewCodeTxtB.Text = $"{otp}";
+                        TimeLeftTxtB.Text = $"{expireDate}";
+                        GetAllUsers();
 
-                        // Send the POST request with the JSON content in the request body
-                        HttpResponseMessage response = await client.PostAsync($"api/Otp/RefreshUser/{userId}", jsonContent);
-
-                        // Handle the response as needed
-                        if (response.IsSuccessStatusCode)
-                        {
-                            var rawResponse = await response.Content.ReadAsStringAsync();
-                            var result = JsonConvert.DeserializeObject<dynamic>(rawResponse);
-
-                            string otp = result.code.code;
-                            string expireDate = result.expireDate;
-
-                            NewCodeTxtB.Text = $"{otp}";
-                            TimeLeftTxtB.Text = $"{expireDate}";
-                            GetData();
-
-                        }
-                        else
-                        {
-                            InfoTxtB.Text += $"Failed to refresh user. Request URL: {client.BaseAddress}api/Otp/RefreshUser/{userId}\n";
-                            InfoTxtB.Text += await response.Content.ReadAsStringAsync();
-                        }
+                    }
+                    else
+                    {
+                        InfoTxtB.Text += $"Failed to refresh user. Request URL: {client.BaseAddress}api/Otp/RefreshUser/{user.Id}\n";
+                        InfoTxtB.Text += await response.Content.ReadAsStringAsync();
                     }
                 }
             }
@@ -199,15 +190,36 @@ namespace OtpUI
             }
             catch (Exception ex)
             {
-                // Log the exception for further analysis
                 InfoTxtB.Text += ex.ToString();
             }
         }
 
 
-        private void GetUsersBtn_Click(object sender, RoutedEventArgs e)
+        // #######################################################################################
+        private void AddUserBtn_Click(object sender, RoutedEventArgs e)
         {
-            GetData();
+            AddNewUser(new User(AddUserNameTxtB.Text));
+        }
+
+        private void LoginBtn_Click(object sender, RoutedEventArgs e)
+        {
+            int id;
+            int.TryParse(LoginTxtB.Text, out id);
+            User user = new User("") { Id = id };
+            LoginUser(user);
+        }
+
+        private void RefreshUserBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if(UserListView.SelectedItem != null)
+            {
+                RefreshUserCode(UserListView.SelectedItem as User);   
+            }
+        }
+
+        private void CopyCodeBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetText(NewCodeTxtB.Text);
         }
     }
 }

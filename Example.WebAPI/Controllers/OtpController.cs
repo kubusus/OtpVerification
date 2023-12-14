@@ -31,7 +31,7 @@ namespace Example.WebAPI.Controllers
         [HttpPost]
         public IActionResult CreateUser(User user)
         {
-            user.isVerify = default;
+            user.isVerified = default;
             user.Id =int.Parse(Generator.RandomString(2,StringsOfLetters.Number));
             users.Add(user);
 
@@ -46,7 +46,7 @@ namespace Example.WebAPI.Controllers
         {
             var user = users.Where(u => u.Id == id).FirstOrDefault();
             if (user is null) return NotFound($"user with Id:{id} not exist");
-            user.isVerify = false;
+            user.isVerified = false;
             var code = otp.GenerateOtp(user.Id.ToString(), expire: out DateTime expierDate);
             // this code sent by Email or SMS
             return Ok(new { Code = code, ExpireDate = expierDate });
@@ -60,11 +60,11 @@ namespace Example.WebAPI.Controllers
             var one = users.Where(u => u.Id == userId).FirstOrDefault();
             if (one is null) return NotFound($"user with Id:{userId} not exist");
 
-            if (one.isVerify) return BadRequest($"user with Id:{userId} is already verified");
+            if (one.isVerified) return BadRequest($"user with Id:{userId} is already verified");
 
             if(otp.VerifyOtp(userId.ToString(), code))
             {
-                one.isVerify = true;
+                one.isVerified = true;
                 return Ok($"user with Id:{userId} successful confirmed his OTP code {code}");
             }
 
