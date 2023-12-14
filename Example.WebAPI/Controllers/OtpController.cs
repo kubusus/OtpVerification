@@ -37,7 +37,7 @@ namespace Example.WebAPI.Controllers
 
             var code = otp.GenerateOtp(user.Id.ToString(),expire: out DateTime expierDate);
             // this code sent by Email or SMS
-            return Ok($"Your via is: {code} ,\nwill expire at: {expierDate}");
+            return Ok(new { Code = code, ExpireDate = expierDate });
         }
 
 
@@ -49,7 +49,7 @@ namespace Example.WebAPI.Controllers
             user.isVerify = false;
             var code = otp.GenerateOtp(user.Id.ToString(), expire: out DateTime expierDate);
             // this code sent by Email or SMS
-            return Ok($"Your via is: {code} ,\nwill expire at: {expierDate}");
+            return Ok(new { Code = code, ExpireDate = expierDate });
         }
 
 

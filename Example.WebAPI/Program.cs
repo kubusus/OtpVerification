@@ -12,6 +12,23 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddOtpVerification(o=>o.UseInMemoryCache());
 builder.Services.AddOtpVerification();//redis
 
+
+
+
+builder.Host.ConfigureLogging(logging =>
+{
+    logging.ClearProviders(); // Remove existing logging providers
+    logging.AddConsole(options =>
+    {
+        // Customize console output
+        options.IncludeScopes = true;
+        options.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
+        options.DisableColors = false; // Enable console colors
+    });
+});
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

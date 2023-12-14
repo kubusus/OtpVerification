@@ -22,7 +22,7 @@
             <Setter Property="Margin" Value="5"/>
         </Style>
     </Window.Resources>
-    
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -39,11 +39,19 @@
 
 
             <TextBlock Text="Code"/>
-            <TextBlock x:Name="NewCodeTxtB"/>
+            <TextBlock x:Name="NewCodeTxtB"
+                       Text=""/>
 
-            <TextBlock Text="Time left"/>
+            <TextBlock Text="Code Expire time"/>
             <TextBlock x:Name="TimeLeftTxtB"/>
 
+            <Button x:Name="GetUsersBtn"
+                    Content="Get users"
+                    Click="GetUsersBtn_Click"/>
+
+            <Button x:Name="RefreshUserBtn"
+                    Content="Refresh code"
+                    Click="RefreshUserBtn_Click"/>
             <ListView x:Name="UserListBox"/>
 
         </StackPanel>
