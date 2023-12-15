@@ -20,6 +20,8 @@ using System.Net.Http.Json;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
+using System.Threading;
+using System.Globalization;
 
 namespace OtpUI
 {
@@ -28,6 +30,8 @@ namespace OtpUI
     /// </summary>
     public partial class MainWindow : Window
     {
+        TimeSpan timeLeft = new TimeSpan();
+        DispatcherTimer timer = new DispatcherTimer();
 
         public MainWindow()
         {
@@ -35,17 +39,31 @@ namespace OtpUI
         }
 
 
-        void StartTimer()
+        void StartTimer(string expiryDate)
         {
-            DispatcherTimer timer = new DispatcherTimer();
+            InfoTxtB.Text = "";
+
+
+            DateTime parsedDate;
+            if (DateTime.TryParseExact(expiryDate, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDate))
+            {
+                timeLeft = parsedDate - DateTime.Now;
+            }
             timer.Interval = TimeSpan.FromSeconds(1);
             timer.Tick += OnTick;
             timer.Start();
         }
 
-        static void OnTick(object sender, EventArgs e)
+        void OnTick(object sender, EventArgs e)
         {
-            
+            TimeLeftTxtB.Text = $"{timeLeft.TotalMinutes:00}:{timeLeft.Seconds:00}";
+            timeLeft -= TimeSpan.FromSeconds(1);
+
+            if (timeLeft.TotalSeconds <= 0)
+            {
+                TimeLeftTxtB.Text = "expired";
+                timer.Stop();
+            }
         }
 
         private async void AddNewUser(User user)
@@ -70,8 +88,11 @@ namespace OtpUI
                         string code = result.code.code;
                         string expireDate = result.expireDate;
 
+
                         NewCodeTxtB.Text = $"{code}";
-                        TimeLeftTxtB.Text = $"{expireDate}";
+                        StartTimer(expireDate);
+                        
+                        
                         GetAllUsers();
                     }
 
@@ -168,7 +189,7 @@ namespace OtpUI
                         string expireDate = result.expireDate;
 
                         NewCodeTxtB.Text = $"{otp}";
-                        TimeLeftTxtB.Text = $"{expireDate}";
+                        StartTimer(expireDate);
                         GetAllUsers();
 
                     }
@@ -220,6 +241,28 @@ namespace OtpUI
         private void CopyCodeBtn_Click(object sender, RoutedEventArgs e)
         {
             Clipboard.SetText(NewCodeTxtB.Text);
+        }
+
+        private User? GetSelectedUser()
+        {
+            if(UserListView.SelectedItem != null)
+            {
+                return (UserListView.SelectedItem as User);
+            }
+            return null;
+        }
+
+        private void UserListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            AddUserNameTxtB.Text = GetSelectedUser()?.FullName;
+            if(GetSelectedUser() != null)
+            {
+                RefreshUserBtn.IsEnabled = true;
+            }
+        }
+
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
         }
     }
 }

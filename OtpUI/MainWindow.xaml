@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OtpUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800"
+        Background="GhostWhite">
 
 
     <Window.Resources>
@@ -23,7 +24,10 @@
         </Style>
     </Window.Resources>
 
-    <Grid>
+    <Grid Margin="50"
+          HorizontalAlignment="Stretch"
+          VerticalAlignment="Top"
+          Background="White">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
@@ -56,17 +60,21 @@
                 <Button x:Name="CopyCodeBtn"
                         Click="CopyCodeBtn_Click"
                         Content="Copy"/>
+                <TextBlock x:Name="TimeLeftTxtB"/>
             </DockPanel>
 
-            <TextBlock x:Name="TimeLeftTxtB"/>
 
 
             <Button x:Name="RefreshUserBtn"
                     Content="Refresh code"
-                    Click="RefreshUserBtn_Click"/>
+                    Click="RefreshUserBtn_Click"
+                    IsEnabled="False"
+                    HorizontalAlignment="Center"
+                    Margin="0,100,0,0"/>
             
             <ListView x:Name="UserListView"
-                       FontSize="20">
+                       FontSize="20"
+                      SelectionChanged="UserListView_SelectionChanged">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="ID" DisplayMemberBinding="{Binding Id}" />
@@ -87,17 +95,20 @@
 
         <!-- Right side -->
         <StackPanel Grid.Column="1" Margin="10">
-            <TextBlock Text="User name:"/>
-            <TextBox Name="LoginTxtB"/>
+            <TextBlock Text="User ID:"/>
+            <TextBox Name="LoginTxtB"
+                     GotFocus="TextBox_GotFocus"/>
 
             <TextBlock Text="Code"/>
-            <TextBox Name="LoginCodeTxtB"/>
+            <TextBox Name="LoginCodeTxtB"
+                     GotFocus="TextBox_GotFocus"/>
 
             <Button x:Name="LoginBtn"
                     Content="Login"
-                    Click="LoginBtn_Click"/>
+                    Click="LoginBtn_Click"
+                    HorizontalAlignment="Center"/>
 
-            <TextBox Name="InfoTxtB"/>
+            <TextBlock Name="InfoTxtB"/>
         </StackPanel>
     </Grid>
 </Window>
