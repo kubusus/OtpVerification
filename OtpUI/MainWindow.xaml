@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OtpUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="MainWindow" Height="auto" Width="800"
         Background="GhostWhite">
 
 
@@ -38,6 +38,10 @@
                     Grid.Column="0" 
                     Margin="10">
 
+            <TextBlock Text="Register"
+                       HorizontalAlignment="Center"
+                       FontSize="40"
+                       FontWeight="Bold"/>
             <DockPanel>
                 <TextBlock Text="User name:"/>
                 <TextBox x:Name="AddUserNameTxtB"
@@ -54,7 +58,8 @@
             
 
 
-            <DockPanel>
+            <DockPanel Name="OtpCodeDockPanel"
+                       Visibility="Collapsed">
                 <TextBlock Text="Code"/>
                 <TextBlock x:Name="NewCodeTxtB"/>
                 <Button x:Name="CopyCodeBtn"
@@ -64,13 +69,17 @@
             </DockPanel>
 
 
+            <TextBlock Text="Users DB"
+                       HorizontalAlignment="Center"
+                       FontSize="40"
+                       FontWeight="Bold"
+                    Margin="0,50,0,10"/>
 
             <Button x:Name="RefreshUserBtn"
                     Content="Refresh code"
                     Click="RefreshUserBtn_Click"
                     IsEnabled="False"
-                    HorizontalAlignment="Center"
-                    Margin="0,100,0,0"/>
+                    HorizontalAlignment="Center"/>
             
             <ListView x:Name="UserListView"
                        FontSize="20"
@@ -95,6 +104,12 @@
 
         <!-- Right side -->
         <StackPanel Grid.Column="1" Margin="10">
+
+            <TextBlock Text="Log in"
+                       HorizontalAlignment="Center"
+                       FontSize="40"
+                       FontWeight="Bold"/>
+
             <TextBlock Text="User ID:"/>
             <TextBox Name="LoginTxtB"
                      GotFocus="TextBox_GotFocus"/>

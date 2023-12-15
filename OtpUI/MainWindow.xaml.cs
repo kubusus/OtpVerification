@@ -220,6 +220,7 @@ namespace OtpUI
         private void AddUserBtn_Click(object sender, RoutedEventArgs e)
         {
             AddNewUser(new User(AddUserNameTxtB.Text));
+            OtpCodeDockPanel.Visibility = Visibility.Visible;
         }
 
         private void LoginBtn_Click(object sender, RoutedEventArgs e)
