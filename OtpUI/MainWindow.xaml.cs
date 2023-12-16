@@ -41,13 +41,18 @@ namespace OtpUI
 
         void StartTimer(string expiryDate)
         {
+            timer.Stop();
+            timeLeft = new TimeSpan();
+            timer = new DispatcherTimer();
             InfoTxtB.Text = "";
-
 
             DateTime parsedDate;
             if (DateTime.TryParseExact(expiryDate, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDate))
             {
                 timeLeft = parsedDate - DateTime.Now;
+                InfoTxtB.Text = "expiryDate: " + expiryDate.ToString() +"\n";
+                InfoTxtB.Text += "paresed date: " + parsedDate.ToString() +"\n";
+                InfoTxtB.Text += DateTime.Now.ToString();
             }
             timer.Interval = TimeSpan.FromSeconds(1);
             timer.Tick += OnTick;
