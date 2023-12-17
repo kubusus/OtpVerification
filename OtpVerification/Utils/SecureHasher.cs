@@ -40,28 +40,31 @@ namespace MhozaifaA.OtpVerification.Utils
         protected static bool Verify(string plain, string hashedPlain, int hashSize = 20)
         {
 
-            // Extract iteration and Base64 string
+            // Split the hashed string into parts
             var splittedHashString = hashedPlain.Split('$');
+
+                // Extract iteration count and Base64-encoded hash
             var iterations = int.Parse(splittedHashString[0]);
             var base64Hash = splittedHashString[1];
 
-            // Get hash bytes
+                // Convert Base64-encoded hash to bytes
             var hashBytes = Convert.FromBase64String(base64Hash);
 
-            // Get salt
+            // Extract salt from the hashBytes
             var salt = new byte[SaltSize];
             Array.Copy(hashBytes, 0, salt, 0, SaltSize);
 
             // Create hash with given salt
             using (var pbkdf2 = new Rfc2898DeriveBytes(plain, salt, iterations))
             {
+                // Generate a hash of the specified size
                 byte[] hash = pbkdf2.GetBytes(hashSize);
 
-                // Get result
+                // Compare the generated hash with the stored hash
                 for (var i = 0; i < hashSize; i++)
                 {
                     if (hashBytes[i + SaltSize] != hash[i])
-                    {
+                    {   // If any byte differs, return false (verification failed)
                         return false;
                     }
                 }
