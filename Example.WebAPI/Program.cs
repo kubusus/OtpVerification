@@ -31,12 +31,16 @@ builder.Host.ConfigureLogging(logging =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
+#region for swagger
+
+//Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+app.UseSwaggerUI();
+}
+
+#endregion
 
 app.UseRouting();
 
