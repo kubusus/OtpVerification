@@ -30,8 +30,8 @@ namespace OtpUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        TimeSpan timeLeft = new TimeSpan();
-        DispatcherTimer timer = new DispatcherTimer();
+        TimeSpan timeLeft;
+        DispatcherTimer timer;
 
         public MainWindow()
         {
@@ -41,27 +41,32 @@ namespace OtpUI
 
         void StartTimer(string expiryDate)
         {
-            timer.Stop();
+
             timeLeft = new TimeSpan();
+
+            if(timer != null)
+            {
+                timer.Tick -= OnTick;
+            }
+
+
             timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Tick += OnTick;
+
             InfoTxtB.Text = "";
 
             DateTime parsedDate;
             if (DateTime.TryParseExact(expiryDate, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDate))
             {
                 timeLeft = parsedDate - DateTime.Now;
-                InfoTxtB.Text = "expiryDate: " + expiryDate.ToString() +"\n";
-                InfoTxtB.Text += "paresed date: " + parsedDate.ToString() +"\n";
-                InfoTxtB.Text += DateTime.Now.ToString();
             }
-            timer.Interval = TimeSpan.FromSeconds(1);
-            timer.Tick += OnTick;
             timer.Start();
         }
 
         void OnTick(object sender, EventArgs e)
         {
-            TimeLeftTxtB.Text = $"{timeLeft.TotalMinutes:00}:{timeLeft.Seconds:00}";
+            TimeLeftTxtB.Text = timeLeft.Minutes.ToString("00") + " : " + timeLeft.Seconds.ToString("00");
             timeLeft -= TimeSpan.FromSeconds(1);
 
             if (timeLeft.TotalSeconds <= 0)
@@ -87,15 +92,14 @@ namespace OtpUI
                     if (response.IsSuccessStatusCode)
                     {
                         var rawResponse = await response.Content.ReadAsStringAsync();
-
                         var result = JsonConvert.DeserializeObject<dynamic>(rawResponse);
 
                         string code = result.code.code;
-                        string expireDate = result.expireDate;
+                        string expiryDate = result.expireDate;
 
 
                         NewCodeTxtB.Text = $"{code}";
-                        StartTimer(expireDate);
+                        StartTimer(expiryDate);
                         
                         
                         GetAllUsers();

@@ -29,7 +29,7 @@ namespace MhozaifaA.OtpVerification
 
             DateTime dateNow = DateTime.Now;
             string plain = Generator.RandomString(option.Size,StringsOfLetters.Number);
-            expire = dateNow.AddSeconds(59 - dateNow.Second).AddMinutes(option.Expire - 1);
+            expire = dateNow.AddMinutes(option.Expire);
             hash = Hash(plain + dateNow.ToString("yyyyMMddHHmm"), option.Length, option.Iterations);
             return plain;
         }
