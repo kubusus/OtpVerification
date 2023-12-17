@@ -274,5 +274,10 @@ namespace OtpUI
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
         }
+
+        private void refreshBtn_Click(object sender, RoutedEventArgs e)
+        {
+            GetAllUsers();
+        }
     }
 }
