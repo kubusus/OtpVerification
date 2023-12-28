@@ -78,16 +78,15 @@ namespace MhozaifaA.OtpVerification
             if (string.IsNullOrEmpty(hashedReference))
                 throw new ArgumentNullException($"{nameof(OtpVerificationService)} {nameof(hashedReference)} can't be null or empty");
 
-            bool verify;
-            int begin = 0;
-            do
-            {
-                var valueToHash = otpCode + DateTime.Now.AddMinutes(-begin).ToString("yyyyMMddHHmm");
-                verify = Verify(valueToHash, hashedReference);
-                begin++;
-            } while (verify == false && begin <= option.ExpiryTimeMin);
+            bool isVerified = false;
 
-            return verify;
+            for (int timeOffsetMin = 0; timeOffsetMin <= option.ExpiryTimeMin && !isVerified; timeOffsetMin++)
+            {
+                var valueToHash = otpCode + DateTime.Now.AddMinutes(-timeOffsetMin).ToString("yyyyMMddHHmm");
+                isVerified = Verify(valueToHash, hashedReference);
+            }
+
+            return isVerified;
         }
 
         public static bool VerifyOtp(string plain, string hash, int expire)

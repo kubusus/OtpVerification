@@ -72,14 +72,11 @@ namespace Example.WebAPI.Controllers
                 return BadRequest($"user with Id:{userId} is already verified");
 
 
-
             if(otp.VerifyOtp(userId.ToString(), code))
             {
                 user.isVerified = true;
                 return Ok($"user with Id:{userId} successful confirmed his OTP code {code}");
             }
-
-
 
             return BadRequest($"user with Id:{userId} enter wrong code or expired");
         }

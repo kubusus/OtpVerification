@@ -37,9 +37,8 @@ namespace MhozaifaA.OtpVerification.Utils
 
         }
 
-        protected static bool Verify(string valueToHash, string hashedReference, int hashSize = 20)
+        protected static bool Verify(string valueToHash, string hashedReference, int hashLength = 20)
         {
-
             // Split the hashed string into parts
             var splittedHashString = hashedReference.Split('$');
 
@@ -58,10 +57,10 @@ namespace MhozaifaA.OtpVerification.Utils
             using (var pbkdf2 = new Rfc2898DeriveBytes(valueToHash, salt, iterations))
             {
                 // Generate a hash of the specified size
-                byte[] hash = pbkdf2.GetBytes(hashSize);
+                byte[] hash = pbkdf2.GetBytes(hashLength);
 
                 // Compare the generated hash with the stored hash
-                for (var i = 0; i < hashSize; i++)
+                for (var i = 0; i < hashLength; i++)
                 {
                     if (hashBytes[i + SaltSize] != hash[i])
                     {   // If any byte differs, return false (verification failed)
