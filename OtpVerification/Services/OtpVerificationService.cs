@@ -111,19 +111,19 @@ namespace OtpVerification.Services
         }
 
 
-        public bool VerifyOtp(string id, string plain, OtpVerificationOptions option)
+        public bool VerifyOtp(string id, string otpCode, OtpVerificationOptions option)//plane is the otp code entered by user
         {
-            string hash = string.Empty;
+            string hashFromMemory = string.Empty;
 
             if (options.IsInMemoryCache)
-                hash = memoryCache.Get<string>(GenerateCacheKey(id));
+                hashFromMemory = memoryCache.Get<string>(GenerateCacheKey(id));
             else
-                hash = distributedCache.GetString(GenerateCacheKey(id));
+                hashFromMemory = distributedCache.GetString(GenerateCacheKey(id));
 
-            if (hash is null)
+            if (hashFromMemory is null)
                 return false;
 
-            if (OtpVerificationExtension.VerifyOtp(plain, hash, option))
+            if (OtpVerificationExtension.VerifyOtp(otpCode, hashFromMemory, option))
             {
                 if (options.IsInMemoryCache)
                     memoryCache.Remove(GenerateCacheKey(id));
@@ -135,14 +135,14 @@ namespace OtpVerification.Services
             return false;
         }
 
-        public bool VerifyOtp(string id, string plain, int expire)
+        public bool VerifyOtp(string id, string otpCode, int expire)
         {
-            return VerifyOtp(id, plain, new OtpVerificationOptions() { Expire = expire });
+            return VerifyOtp(id, otpCode, new OtpVerificationOptions() { ExpiryTimeMin = expire });
         }
 
-        public bool VerifyOtp(string id, string plain)
+        public bool VerifyOtp(string id, string otpCode)//plane is the otp code entered by user
         {
-            return VerifyOtp(id, plain, options);
+            return VerifyOtp(id, otpCode, options);
         }
 
         public bool VerifyOtp(string url)

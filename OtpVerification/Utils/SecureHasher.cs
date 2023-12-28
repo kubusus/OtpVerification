@@ -37,11 +37,11 @@ namespace MhozaifaA.OtpVerification.Utils
 
         }
 
-        protected static bool Verify(string plain, string hashedPlain, int hashSize = 20)
+        protected static bool Verify(string valueToHash, string hashedReference, int hashSize = 20)
         {
 
             // Split the hashed string into parts
-            var splittedHashString = hashedPlain.Split('$');
+            var splittedHashString = hashedReference.Split('$');
 
                 // Extract iteration count and Base64-encoded hash
             var iterations = int.Parse(splittedHashString[0]);
@@ -55,7 +55,7 @@ namespace MhozaifaA.OtpVerification.Utils
             Array.Copy(hashBytes, 0, salt, 0, SaltSize);
 
             // Create hash with given salt
-            using (var pbkdf2 = new Rfc2898DeriveBytes(plain, salt, iterations))
+            using (var pbkdf2 = new Rfc2898DeriveBytes(valueToHash, salt, iterations))
             {
                 // Generate a hash of the specified size
                 byte[] hash = pbkdf2.GetBytes(hashSize);

@@ -24,25 +24,25 @@ namespace MhozaifaA.OtpVerification
         /// Number of complexity of rounds hashing.
         /// <para>Default value 1</para>
         /// </summary>
-        public int Iterations { get; set; } = 1;
+        public int HashIterations { get; set; } = 1;
 
         /// <summary>
         /// Number of char code generator to hash.
         /// <para>Default value 6</para>
         /// </summary>
-        public int Size { get; set; } = 6;
+        public int OtpLength { get; set; } = 6;
 
         /// <summary>
         /// Length hash result.
         /// <para>Default value 20</para>
         /// </summary>
-        public int Length { get; set; } = 20;
+        public int HashLength { get; set; } = 20;
 
 
         /// <summary>
         /// Measure after minutes.
         /// <para>Default value 2</para>
         /// </summary>
-        public int Expire { get; set; } = 2;
+        public int ExpiryTimeMin { get; set; } = 2;
     }
 }

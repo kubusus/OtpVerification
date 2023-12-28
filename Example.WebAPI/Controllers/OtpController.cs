@@ -35,9 +35,9 @@ namespace Example.WebAPI.Controllers
             user.Id =int.Parse(Generator.RandomString(2,StringsOfLetters.Number));
             users.Add(user);
 
-            var code = otp.GenerateOtp(user.Id.ToString(),expire: out DateTime expierDate);
-            // this code sent by Email or SMS
-            return Ok(new { Code = code, ExpireDate = expierDate });
+            var otpCode = otp.GenerateOtp(user.Id.ToString(),expire: out DateTime expiryDate);
+            
+            return Ok(new { Code = otpCode, ExpireDate = expiryDate });// this code sent by Email or SMS
         }
 
 
@@ -51,11 +51,11 @@ namespace Example.WebAPI.Controllers
             
             user.isVerified = false;
             
-            var code = otp.GenerateOtp(user.Id.ToString(), expire: out DateTime expierDate);
+            var otpCode = otp.GenerateOtp(user.Id.ToString(), expire: out DateTime expiryDate);
             
             
             // this code sent by Email or SMS
-            return Ok(new { Code = code, ExpireDate = expierDate });
+            return Ok(new { Code = otpCode, ExpireDate = expiryDate });
         }
 
 

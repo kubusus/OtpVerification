@@ -15,23 +15,23 @@ namespace MhozaifaA.OtpVerification
             if (option is null)
                 throw new ArgumentNullException($"{nameof(OtpVerificationService)} {nameof(option)} can't be null");
 
-            if (option.Size <= 0)
-                throw new ArgumentException($"{nameof(OtpVerificationService)} {nameof(option.Size)} can't be 0 or low");
+            if (option.OtpLength <= 0)
+                throw new ArgumentException($"{nameof(OtpVerificationService)} {nameof(option.OtpLength)} can't be 0 or low");
 
-            if (option.Length <= 0)
-                throw new ArgumentException($"{nameof(OtpVerificationService)} {nameof(option.Length)} can't be 0 or low");
+            if (option.HashLength <= 0)
+                throw new ArgumentException($"{nameof(OtpVerificationService)} {nameof(option.HashLength)} can't be 0 or low");
 
-            if (option.Expire < 0)
-                throw new ArgumentException($"{nameof(OtpVerificationService)} {nameof(option.Expire)} can't be low than 0");
+            if (option.ExpiryTimeMin < 0)
+                throw new ArgumentException($"{nameof(OtpVerificationService)} {nameof(option.ExpiryTimeMin)} can't be low than 0");
 
-            if (option.Iterations <= 0)
-                throw new ArgumentException($"{nameof(OtpVerificationService)} {nameof(option.Iterations)} can't be 0 or low");
+            if (option.HashIterations <= 0)
+                throw new ArgumentException($"{nameof(OtpVerificationService)} {nameof(option.HashIterations)} can't be 0 or low");
 
             DateTime dateNow = DateTime.Now;
-            string plain = Generator.RandomString(option.Size,StringsOfLetters.Number);
-            expire = dateNow.AddMinutes(option.Expire);
-            hash = Hash(plain + dateNow.ToString("yyyyMMddHHmm"), option.Length, option.Iterations);
-            return plain;
+            string otpCode = Generator.RandomString(option.OtpLength,StringsOfLetters.Number);
+            expire = dateNow.AddMinutes(option.ExpiryTimeMin);
+            hash = Hash(otpCode + dateNow.ToString("yyyyMMddHHmm"), option.HashLength, option.HashIterations);
+            return otpCode;
         }
 
         public static string Generate(out DateTime expire, out string hash)
@@ -70,28 +70,29 @@ namespace MhozaifaA.OtpVerification
         }
 
 
-        public static bool VerifyOtp(string plain, string hash, OtpVerificationOptions option)
+        public static bool VerifyOtp(string otpCode, string hashedReference, OtpVerificationOptions option)
         {
-            if (string.IsNullOrEmpty(plain))
-                throw new ArgumentNullException($"{nameof(OtpVerificationService)} {nameof(plain)} can't be null or empty");
+            if (string.IsNullOrEmpty(otpCode))
+                throw new ArgumentNullException($"{nameof(OtpVerificationService)} {nameof(otpCode)} can't be null or empty");
 
-            if (string.IsNullOrEmpty(hash))
-                throw new ArgumentNullException($"{nameof(OtpVerificationService)} {nameof(hash)} can't be null or empty");
+            if (string.IsNullOrEmpty(hashedReference))
+                throw new ArgumentNullException($"{nameof(OtpVerificationService)} {nameof(hashedReference)} can't be null or empty");
 
             bool verify;
             int begin = 0;
             do
             {
-                verify = Verify(plain + DateTime.Now.AddMinutes(-begin).ToString("yyyyMMddHHmm"), hash);
+                var valueToHash = otpCode + DateTime.Now.AddMinutes(-begin).ToString("yyyyMMddHHmm");
+                verify = Verify(valueToHash, hashedReference);
                 begin++;
-            } while (verify == false && begin <= option.Expire);
+            } while (verify == false && begin <= option.ExpiryTimeMin);
 
             return verify;
         }
 
         public static bool VerifyOtp(string plain, string hash, int expire)
         {
-            return VerifyOtp(plain, hash, new OtpVerificationOptions() { Expire = expire });
+            return VerifyOtp(plain, hash, new OtpVerificationOptions() { ExpiryTimeMin = expire });
         }
 
         public static bool VerifyOtp(string plain, string hash)
